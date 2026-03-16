@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Tickets;
 use Illuminate\Http\Request;
 
 class TicketsController extends Controller
@@ -9,56 +10,37 @@ class TicketsController extends Controller
     /**
      * Display a listing of the resource.
      */
+    
     public function index()
     {
-        //
+        $tickets = Tickets::orderBy('created_at', 'desc')->get();
+
+        return view('admin.ticket.index', compact('tickets'));
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
     public function create()
     {
-        //
+        return view('admin.ticket.create');
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(Request $request)
     {
-        //
-    }
+        $request->validate([
+            'title' => 'required|string|max:255',
+            'description' => 'required|string|max:255',
+            'priority' => 'required|string|max:255',
+            'tech' => 'required|string|max:255',
+        ]);
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
-    {
-        //
-    }
+        Tickets::create([
+            'title' => $request->title,
+            'description' => $request->description,
+            'priority' => $request->priority,
+            'tech' => $request->tech,
+        ]);
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
-    {
-        //
+        return redirect()
+            ->route('admin.ticket.index')
+            ->with('success', __('Ticket guardado correctamente'));
     }
 }
